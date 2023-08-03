@@ -85,7 +85,7 @@ describe('Authentication', () => {
         expect(response.status).to.eq(200);
         expect(response.body.errorMessage).to.include('User does not exist');
       });
-    });
+    }); 
 
     it('Check if login with correct camps', () => {
       cy.blazeRequest('login', registrationData).then((response) => {
@@ -94,22 +94,4 @@ describe('Authentication', () => {
       });
     });
   });
-});
-
-describe('Products', () => {
-  it('should search products by a phone', () => {});
-
-  it('should search products by laptops', () => {});
-
-  it('should search products by monitors', () => {});
-
-  it('should validate the addition of products to the cart', () => {});
-
-  it('should validate redirection to home screen', () => {});
-
-  it('should validate redirection to contact us screen', () => {});
-
-  it('should validate redirection to about us screen', () => {});
-
-  it('should validate the correct value of cart items', () => {});
 });

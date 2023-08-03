@@ -46,11 +46,31 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add('blazeRequest', (endpoint, registrationData) => {
-  cy.request('POST', `https://api.demoblaze.com/${endpoint}`, {
-    username: registrationData.username,
-    password: registrationData.password,
-  }).then((response) => {
+Cypress.Commands.add('blazeRequest', (endpoint, data) => {
+  cy.request('POST', `${cy.config('apiUrl')}${endpoint}`, data).then((response) => {
     return response;
+  });
+});
+
+Cypress.Commands.add('retrieveProducts', (elementSelector) => {
+  return cy.get(elementSelector).then((products) => {
+    const productList = [];
+
+    products.each((index, product) => {
+      const productName = Cypress.$(product).find('.card-title').text();
+      const productDesc = Cypress.$(product).find('.card-text').text();
+      const productPrice = parseInt(Cypress.$(product).find('h5').text());
+
+      const productData = {
+        productName: productName,
+        productDesc: productDesc,
+        productPrice: productPrice,
+        selector: product,
+      };
+
+      productList.push(productData);
+    });
+
+    return productList;
   });
 });
