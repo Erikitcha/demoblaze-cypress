@@ -25,7 +25,7 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 Cypress.Commands.add(
-  'isInMenu',
+  "isInMenu",
   (menuTitleSelector, menuNameSelector, closeButtonSelector) => {
     const MENU_TITLE = cy.get(menuTitleSelector);
     MENU_TITLE.contains(menuNameSelector);
@@ -36,7 +36,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add(
-  'fillAndSubmit',
+  "fillAndSubmit",
   (registrationData, submitButtonSelector) => {
     Object.entries(registrationData).forEach(([selector, value]) => {
       cy.get(selector).type(value);
@@ -46,25 +46,28 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add('blazeRequest', (endpoint, data) => {
-  cy.request('POST', `${cy.config('apiUrl')}${endpoint}`, data).then((response) => {
-    return response;
-  });
+Cypress.Commands.add("blazeRequest", (endpoint, data) => {
+  cy.request("POST", `${cy.config("apiUrl")}${endpoint}`, data).then(
+    (response) => {
+      return response;
+    }
+  );
 });
 
-Cypress.Commands.add('retrieveProducts', (elementSelector) => {
+Cypress.Commands.add("retrieveProducts", (elementSelector) => {
   return cy.get(elementSelector).then((products) => {
     const productList = [];
 
     products.each((index, product) => {
-      const productName = Cypress.$(product).find('.card-title').text();
-      const productDesc = Cypress.$(product).find('.card-text').text();
-      const productPrice = parseInt(Cypress.$(product).find('h5').text());
+      const productName = Cypress.$(product).find(".card-title").text();
+      const productDesc = Cypress.$(product).find(".card-text").text();
+      const productPrice = parseInt(Cypress.$(product).find("h5").text());
 
       const productData = {
         productName: productName,
         productDesc: productDesc,
         productPrice: productPrice,
+
         selector: product,
       };
 
@@ -72,5 +75,35 @@ Cypress.Commands.add('retrieveProducts', (elementSelector) => {
     });
 
     return productList;
+  });
+});
+
+Cypress.Commands.add("searchProductsByCat", (category) => {
+  cy.blazeRequest("bycat", {
+    cat: category,
+  }).then((response) => {
+    return {
+      items: response.body.Items,
+      filteredNames: response.body.Items.map((product) => product.title),
+    };
+  });
+});
+
+Cypress.Commands.add("hookProductFilterName", (name, category) => {
+  cy.searchProductsByCat(category).then((products) =>
+    cy.wrap(products.filteredNames).as(name)
+  );
+});
+
+Cypress.Commands.add("productFilterContext", (filterName) => {
+  cy.get(filterName).then((filteredNames) => {
+    cy.retrieveProducts(".card.h-100").then((products) => {
+      const names = products.map((product) => product.productName);
+
+      cy.wrap({
+        filteredNames: filteredNames,
+        allProductsName: names,
+      }).as("productFilterContext");
+    });
   });
 });

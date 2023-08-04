@@ -1,4 +1,3 @@
-import loc from '../support/locators.js';
 
 const { faker } = require('@faker-js/faker');
 
@@ -46,6 +45,13 @@ describe('Authentication', () => {
         expect(response.body).to.be.empty;
       });
     });
+
+    it('Check if user already exists', () =>{
+      cy.blazeRequest('signup', registrationData).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body.errorMessage).to.equal("This user already exist.");
+      });
+    })
   });
 
   context('Login', () => {
