@@ -1,10 +1,11 @@
 {
   "name": "demoblaze-cypress",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.01",
+  "description": "Automatization for demoblaze-cypress",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "cy:authentication_filter": "cypress run --spec cypress/e2e/authentication.cy.js",
+    "cy:products_filter": "cypress run --spec cypress/e2e/products.filter.cy.js"
   },
   "author": "",
   "license": "ISC",

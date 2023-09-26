@@ -1,37 +1,8 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-
 Cypress.Commands.add(
   "isInMenu",
   (menuTitleSelector, menuNameSelector, closeButtonSelector) => {
-    const MENU_TITLE = cy.get(menuTitleSelector);
-    MENU_TITLE.contains(menuNameSelector);
-
-    const CLOSE_SIGN_UP_BUTTON = cy.get(closeButtonSelector);
-    CLOSE_SIGN_UP_BUTTON.click();
+    cy.get(menuTitleSelector).contains(menuNameSelector);
+    cy.get(closeButtonSelector).click();
   }
 );
 
@@ -48,9 +19,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add("blazeRequest", (endpoint, data) => {
   cy.request("POST", `${cy.config("apiUrl")}${endpoint}`, data).then(
-    (response) => {
-      return response;
-    }
+    (response) => cy.wrap({ content: response })
   );
 });
 
@@ -58,7 +27,7 @@ Cypress.Commands.add("retrieveProducts", (elementSelector) => {
   return cy.get(elementSelector).then((products) => {
     const productList = [];
 
-    products.each((index, product) => {
+    products.each((_, product) => {
       const productName = Cypress.$(product).find(".card-title").text();
       const productDesc = Cypress.$(product).find(".card-text").text();
       const productPrice = parseInt(Cypress.$(product).find("h5").text());
@@ -74,7 +43,7 @@ Cypress.Commands.add("retrieveProducts", (elementSelector) => {
       productList.push(productData);
     });
 
-    return productList;
+    cy.wrap({ products: productList });
   });
 });
 
@@ -82,28 +51,28 @@ Cypress.Commands.add("searchProductsByCat", (category) => {
   cy.blazeRequest("bycat", {
     cat: category,
   }).then((response) => {
-    return {
-      items: response.body.Items,
-      filteredNames: response.body.Items.map((product) => product.title),
-    };
+    cy.wrap({
+      items: response.content.body.Items,
+      title: response.content.body.Items.map((product) => product.title),
+    });
   });
 });
 
 Cypress.Commands.add("hookProductFilterName", (name, category) => {
   cy.searchProductsByCat(category).then((products) =>
-    cy.wrap(products.filteredNames).as(name)
+    cy.wrap(products.title).as(name)
   );
 });
 
 Cypress.Commands.add("productFilterContext", (filterName) => {
   cy.get(filterName).then((filteredNames) => {
-    cy.retrieveProducts(".card.h-100").then((products) => {
-      const names = products.map((product) => product.productName);
+    cy.retrieveProducts(".card.h-100").then((response) => {
+      const names = response.products.map((product) => product.productName);
 
       cy.wrap({
         filteredNames: filteredNames,
         allProductsName: names,
-      }).as("productFilterContext");
+      });
     });
   });
 });

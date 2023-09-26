@@ -1,6 +1,7 @@
 describe("Filter API", () => {
+  
   beforeEach(() => {
-    cy.visit("https://demoblaze.com/#");
+    cy.visit("/");
   });
 
   context("Laptop Filter", () => {
@@ -35,7 +36,7 @@ describe("Filter API", () => {
     it("Apply phone category", () => {
       cy.searchProductsByCat("phone").then((products) => {
         products.items.forEach((product) =>
-          expect(product.cat).to.eq("notebook")
+          expect(product.cat).to.eq("phone")
         );
       });
     });
@@ -56,7 +57,7 @@ describe("Filter API", () => {
     it("Apply monitor category", () => {
       cy.searchProductsByCat("monitor").then((products) => {
         products.items.forEach((product) =>
-          expect(product.cat).to.eq("notebook")
+          expect(product.cat).to.eq("monitor")
         );
       });
     });

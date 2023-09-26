@@ -8,13 +8,12 @@ const registrationData = {
 
 describe('Authentication', () => {
   beforeEach(() => {
-    cy.visit('https://www.demoblaze.com/index.html');
+    cy.visit('/index.html');
   });
 
   context('Registration', () => {
     beforeEach(() => {
-      const SIGN_UP_BUTTON = cy.get('#signin2');
-      SIGN_UP_BUTTON.click();
+      cy.get('#signin2').click();
 
       cy.wait(1000);
     });
@@ -41,24 +40,22 @@ describe('Authentication', () => {
 
     it('Check if user was created succesfuly', () => {
       cy.blazeRequest('signup', registrationData).then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body).to.be.empty;
+        expect(response.content.status).to.eq(200);
+        expect(response.content.body).to.be.empty;
       });
     });
 
     it('Check if user already exists', () =>{
       cy.blazeRequest('signup', registrationData).then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body.errorMessage).to.equal("This user already exist.");
+        expect(response.content.status).to.eq(200);
+        expect(response.content.body.errorMessage).to.equal("This user already exist.");
       });
     })
   });
 
   context('Login', () => {
     beforeEach(() => {
-      const LOGIN_BUTTON = cy.get('#login2');
-      LOGIN_BUTTON.click();
-
+      cy.get('#login2').click();
       cy.wait(1000);
     });
 
@@ -85,18 +82,19 @@ describe('Authentication', () => {
     it('Check if login with wrong camps', () => {
       cy.blazeRequest('login', {
         //here we use absolutely anything that probably won't exist
+        
         username: faker.commerce.productMaterial(),
         password: faker.internet.password(),
       }).then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body.errorMessage).to.include('User does not exist');
+        expect(response.content.status).to.eq(200);
+        expect(response.content.body.errorMessage).to.include('User does not exist');
       });
     }); 
 
     it('Check if login with correct camps', () => {
       cy.blazeRequest('login', registrationData).then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body).to.include('Auth_token:');
+        expect(response.content.status).to.eq(200);
+        expect(response.content.body).to.include('Auth_token:');
       });
     });
   });

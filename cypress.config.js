@@ -1,10 +1,19 @@
 const { defineConfig } = require("cypress");
+const { rm } = require("node:fs");
 
 module.exports = defineConfig({
-  apiUrl: 'https://api.demoblaze.com/',
   e2e: {
+    baseUrl: "https://demoblaze.com/#",
+
     setupNodeEvents(on, config) {
-      // implement node event listeners here
+      on("after:screenshot", () => {
+        rm(config.screenshotsFolder, {
+          recursive: true,
+        }, () => {});
+      });
     },
   },
+
+  video: false,
+  apiUrl: "https://api.demoblaze.com/",
 });
